@@ -35,8 +35,7 @@ function main() {
 `;
 
   const fsSource = `
-	// Author:
-	// Title:
+	#version 330 core
 	
 	#ifdef GL_ES
 	precision mediump float;

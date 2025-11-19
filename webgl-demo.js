@@ -32,11 +32,8 @@ function main() {
   const vsSource = `
     attribute vec4 aVertexPosition;
 
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-
     void main(void) {
-      gl_Position = uModelViewMatrix * uProjectionMatrix * aVertexPosition;
+      gl_Position = aVertexPosition;
     }
   `;
 
@@ -139,11 +136,6 @@ function main() {
       vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
     },
     uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(
-        shaderProgram,
-        "uProjectionMatrix"
-      ),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
       aspectVector: gl.getUniformLocation(shaderProgram, "uAspect"),
       deltaTime: gl.getUniformLocation(shaderProgram, "uTime"),
     },

@@ -15,30 +15,9 @@ function drawScene(gl, programInfo, buffers, squareRotation, deltaTime) {
   // and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
 
-  const fieldOfView = (45 * Math.PI) / 180; // in radians
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
-  const zFar = 100.0;
-  const projectionMatrix = mat4.create();
   const aspectVector = new Float32Array(2);
   aspectVector[0] = gl.canvas.clientWidth;
   aspectVector[1] = gl.canvas.clientHeight;
-
-  // note: glmatrix.js always has the first argument
-  // as the destination to receive the result.
-  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-
-  // Set the drawing position to the "identity" point, which is
-  // the center of the scene.
-  const modelViewMatrix = mat4.create();
-
-  // Now move the drawing position a bit to where we want to
-  // start drawing the square.
-  mat4.translate(
-    modelViewMatrix, // destination matrix
-    modelViewMatrix, // matrix to translate
-    [0.0, 0.0, 0.0]
-  ); // amount to translate
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
@@ -50,16 +29,6 @@ function drawScene(gl, programInfo, buffers, squareRotation, deltaTime) {
   gl.useProgram(programInfo.program);
 
   // Set the shader uniforms
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.projectionMatrix,
-    false,
-    projectionMatrix
-  );
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.modelViewMatrix,
-    false,
-    modelViewMatrix
-  );
   gl.uniform2fv(
     programInfo.uniformLocations.aspectVector,
     aspectVector
@@ -67,7 +36,7 @@ function drawScene(gl, programInfo, buffers, squareRotation, deltaTime) {
   gl.uniform1f(
     programInfo.uniformLocations.deltaTime,
     deltaTime
-  )
+  );
 
   {
     const offset = 0;

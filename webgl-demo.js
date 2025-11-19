@@ -36,7 +36,7 @@ function main() {
     //uniform mat4 uProjectionMatrix;
 
     void main(void) {
-      gl_Position = aVertexPosition;
+      gl_Position = uModelViewMatrix * uProjectionMatrix * aVertexPosition;
     }
   `;
 

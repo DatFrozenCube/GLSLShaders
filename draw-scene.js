@@ -37,7 +37,7 @@ function drawScene(gl, programInfo, buffers, squareRotation, deltaTime) {
   mat4.translate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to translate
-    [-0.0, 0.0, -6.0]
+    [0.0, 0.0, 0.0]
   ); // amount to translate
 
   // Tell WebGL how to pull out the positions from the position

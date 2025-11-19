@@ -34,6 +34,7 @@ function drawScene(gl, programInfo, buffers, squareRotation, deltaTime) {
 
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
+  /*
   mat4.translate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to translate
@@ -46,6 +47,7 @@ function drawScene(gl, programInfo, buffers, squareRotation, deltaTime) {
     squareRotation, // amount to rotate in radians
     [0, 0, 1]
   ); // axis to rotate around
+  */
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.

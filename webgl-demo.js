@@ -102,7 +102,7 @@ function main() {
       vec3 col = palette(d1);
         
       vec3 lcol = vec3(3., 2., 1.);
-      lcol.y*=pow(u_time,8.);
+      lcol.y*=pow(uTime,8.);
         
       uv.xy += vec2(-1.0,0.0);
       uv0.xy += vec2(1.0,0.0);

@@ -32,8 +32,8 @@ function main() {
   const vsSource = `
     attribute vec4 aVertexPosition;
 
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
+    //uniform mat4 uModelViewMatrix;
+    //uniform mat4 uProjectionMatrix;
 
     void main(void) {
       gl_Position = aVertexPosition;
@@ -43,48 +43,84 @@ function main() {
   // Fragment shader program
 
   const fsSource = `
-    precision highp float;
+    // Author:
+    // Title:
+
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
 
     uniform vec2 uAspect;
     uniform float uTime;
 
     vec3 bcol = vec3(1.0, 2.0, 3.0);
 
-    //[[0.558 0.608 0.968] [0.398 0.188 0.098] [0.748 -1.702 -2.092] [0.378 -1.742 -4.045]]
+    //[[0.072 0.131 0.531] [0.009 0.840 0.177] [0.252 0.541 0.462] [3.268 2.475 1.847]]
 
     vec3 palette( in float t ){
-        vec3 a = vec3(0.558, 0.608, 0.968);
-        vec3 b = vec3(0.398, 0.188, 0.098);
-        vec3 c = vec3(0.748, -1.702, -2.092);
-        vec3 d = vec3(0.378, -1.742, -4.045);
+        vec3 a = vec3(0.072, 0.131, 0.531);
+        vec3 b = vec3(0.009, 0.840, 0.177);
+        vec3 c = vec3(0.252, 0.541, 0.462);
+        vec3 d = vec3(3.268, 2.475, 1.847);
         
         return a + b*cos( 6.283185*(c*t+d) );
     }
 
+    float sdSegment( in vec2 p, in vec2 a, in vec2 b ){
+        vec2 pa = p-a, ba = b-a;
+        float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+        return length( pa - ba*h );
+    }
+
     void main() {
       vec2 uv = (gl_FragCoord.xy * 2. - uAspect.xy) / uAspect.y;
-      uv.x += 0.5;
       vec2 uv0 = uv;
+      vec2 uv1 = uv;
+      vec2 uv2 = uv;
+      uv.x += 0.5;
+      uv0.x -= 0.5;
       vec3 finalColor = vec3(0.0);
+        
+      vec2 pos1 = vec2(-1., 0.);
+      vec2 pos2 = vec2(1., 0.);
+      float s1 = sdSegment(uv2, fract(pos1), fract(pos2));
         
       float c1 = length(uv);
       c1 = sin(c1*4.888)/6.;
       c1 = abs(c1);
         
-      float d = length(uv*2.0) - 0.5;
-      d = abs(d);
-      
-      vec3 col = vec3(-1.);
-      vec3 g;
+      float c2 = length(uv0);
+      c2 = sin(c2*4.888)/6.;
+      c2 = abs(c2);
+        
+      float d1 = length(uv*2.0) - 0.5;
+      d1 = abs(d1);
+        
+      float d2 = length(uv0*2.0) - 0.5;
+      d2 = abs(d2);
+        
+      vec3 col = palette(d1);
+        
+      vec3 lcol = vec3(3., 2., 1.);
+      lcol.y*=pow(u_time,8.);
+        
+      uv.xy += vec2(-1.0,0.0);
+      uv0.xy += vec2(1.0,0.0);
+        
+      float a1 = atan(uv0.y, uv0.x)+uTime*.04;
+      float a2 = atan(uv.y, uv.x)-uTime*.04;
 
-      float a = atan(uv.x, uv.y)+uTime*-0.04;
+      float r1 = smoothstep(-0.5,1., cos(a1*10.))*0.2+0.4;
+      float r2 = smoothstep(-.5,1.0, cos(a2*10.))*-0.2+0.6;
 
-      float r = smoothstep(-.5,1., cos(a*10.))*0.2+0.5;
+      vec3 g1 = vec3(1.-smoothstep(r1,r1+0.02,d1));
+      vec3 g2 = vec3(1.-smoothstep(r2,r2+0.02,d2));
+      vec3 l1 = vec3(s1);
+        
+      finalColor += g1 * col * -uv.y;
+      finalColor += g2 * col * uv0.y;
+      //finalColor += l1 / lcol;
 
-      g = vec3(1.-smoothstep(r,r+0.02,d));        
-      
-      finalColor += g * col * uv.y;
-      
       gl_FragColor = vec4(finalColor,1.0);
     }
   `;

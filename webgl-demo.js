@@ -44,9 +44,7 @@ function main() {
   // Fragment shader program
 
   const fsSource = `
-    #ifdef GL_ES
-    precision mediump float;
-    #endif
+    precision highp float;
 
     uniform vec2 uAspect;
     uniform float uTime;

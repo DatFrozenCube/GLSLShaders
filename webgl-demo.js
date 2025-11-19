@@ -1,6 +1,9 @@
 import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
 
+let squareRotation = 0.0;
+let deltaTime = 0;
+
 main();
 
 //
@@ -33,21 +36,55 @@ function main() {
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
 
-    varying lowp vec4 vColor;
-
     void main(void) {
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      vColor = aVertexColor;
     }
   `;
 
   // Fragment shader program
 
   const fsSource = `
-    varying lowp vec4 vColor;
+    uniform vec2 uAspect;
+    uniform float uTime;
 
-    void main(void) {
-      gl_FragColor = vColor;
+    vec3 bcol = vec3(1.0, 2.0, 3.0);
+
+    //[[0.558 0.608 0.968] [0.398 0.188 0.098] [0.748 -1.702 -2.092] [0.378 -1.742 -4.045]]
+
+    vec3 palette( in float t ){
+        vec3 a = vec3(0.558, 0.608, 0.968);
+        vec3 b = vec3(0.398, 0.188, 0.098);
+        vec3 c = vec3(0.748, -1.702, -2.092);
+        vec3 d = vec3(0.378, -1.742, -4.045);
+        
+        return a + b*cos( 6.283185*(c*t+d) );
+    }
+
+    void main() {
+      vec2 uv = (gl_FragCoord.xy * 2. - uAspect.xy) / uAspect.y;
+      uv.x += 0.5;
+      vec2 uv0 = uv;
+      vec3 finalColor = vec3(0.0);
+        
+      float c1 = length(uv);
+      c1 = sin(c1*4.888)/6.;
+      c1 = abs(c1);
+        
+      float d = length(uv*2.0) - 0.5;
+      d = abs(d);
+      
+      vec3 col = vec3(-1.);
+      vec3 g;
+
+      float a = atan(uv.x, uv.y)+uTime*-0.04;
+
+      float r = smoothstep(-.5,1., cos(a*10.))*0.2+0.5;
+
+      g = vec3(1.-smoothstep(r,r+0.02,d));        
+      
+      finalColor += g * col * uv.y;
+      
+      gl_FragColor = vec4(finalColor,1.0);
     }
   `;
 
@@ -71,6 +108,8 @@ function main() {
         "uProjectionMatrix"
       ),
       modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
+      aspectVector: gl.getUniformLocation(shaderProgram, "uAspect"),
+      deltaTime: gl.getUniformLocation(shaderProgram, "uTime"),
     },
   };
 
@@ -78,8 +117,20 @@ function main() {
   // objects we'll be drawing.
   const buffers = initBuffers(gl);
 
-  // Draw the scene
-  drawScene(gl, programInfo, buffers);
+  let then = 0;
+
+  // Draw the scene repeatedly
+  function render(now) {
+    now *= 0.001; // convert to seconds
+    deltaTime = now - then;
+    then = now;
+
+    drawScene(gl, programInfo, buffers, squareRotation, deltaTime);
+    squareRotation += deltaTime;
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
 }
 
 //

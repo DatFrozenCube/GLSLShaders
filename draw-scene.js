@@ -1,4 +1,4 @@
-function drawScene(gl, programInfo, buffers) {
+function drawScene(gl, programInfo, buffers, squareRotation, deltaTime) {
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
   gl.clearDepth(1.0); // Clear everything
   gl.enable(gl.DEPTH_TEST); // Enable depth testing
@@ -20,6 +20,9 @@ function drawScene(gl, programInfo, buffers) {
   const zNear = 0.1;
   const zFar = 100.0;
   const projectionMatrix = mat4.create();
+  const aspectVector = new Float32Array(2);
+  aspectVector[0] = gl.canvas.clientWidth;
+  aspectVector[1] = gl.canvas.clientHeight;
 
   // note: glmatrix.js always has the first argument
   // as the destination to receive the result.
@@ -36,6 +39,13 @@ function drawScene(gl, programInfo, buffers) {
     modelViewMatrix, // matrix to translate
     [-0.0, 0.0, -6.0]
   ); // amount to translate
+
+  mat4.rotate(
+    modelViewMatrix, // destination matrix
+    modelViewMatrix, // matrix to rotate
+    squareRotation, // amount to rotate in radians
+    [0, 0, 1]
+  ); // axis to rotate around
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
@@ -57,6 +67,14 @@ function drawScene(gl, programInfo, buffers) {
     false,
     modelViewMatrix
   );
+  gl.uniform2fv(
+    programInfo.uniformLocations.aspectVector,
+    aspectVector
+  );
+  gl.uniform1f(
+    programInfo.uniformLocations.deltaTime,
+    deltaTime
+  )
 
   {
     const offset = 0;

@@ -2,6 +2,7 @@ import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
 
 let deltaTime = 0;
+let elapsedTime = 0;
 
 main();
 
@@ -144,7 +145,7 @@ function main() {
   // objects we'll be drawing.
   const buffers = initBuffers(gl);
 
-  //let then = 0;
+  let then = 0;
 
   // Draw the scene repeatedly
   function render(now) {
@@ -152,7 +153,8 @@ function main() {
     deltaTime = now - then;
     then = now;
 
-    drawScene(gl, programInfo, buffers, deltaTime);
+    elapsedTime += deltaTime;
+    drawScene(gl, programInfo, buffers, elapsedTime);
 
     requestAnimationFrame(render);
   }

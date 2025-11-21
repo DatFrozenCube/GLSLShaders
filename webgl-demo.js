@@ -1,7 +1,6 @@
 import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
 
-let squareRotation = 0.0;
 let deltaTime = 0;
 
 main();
@@ -153,8 +152,7 @@ function main() {
     deltaTime = now - then;
     then = now;
 
-    drawScene(gl, programInfo, buffers, squareRotation, deltaTime);
-    squareRotation += deltaTime;
+    drawScene(gl, programInfo, buffers, deltaTime);
 
     requestAnimationFrame(render);
   }

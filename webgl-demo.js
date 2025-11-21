@@ -144,7 +144,7 @@ function main() {
   // objects we'll be drawing.
   const buffers = initBuffers(gl);
 
-  let then = 0;
+  //let then = 0;
 
   // Draw the scene repeatedly
   function render(now) {

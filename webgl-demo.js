@@ -1,8 +1,8 @@
 import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
 
+let squareRotation = 0.0;
 let deltaTime = 0;
-let elapsedTime = 0;
 
 main();
 
@@ -31,94 +31,26 @@ function main() {
 
   const vsSource = `
     attribute vec4 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying lowp vec4 vColor;
 
     void main(void) {
-      gl_Position = aVertexPosition;
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      vColor = aVertexColor;
     }
   `;
 
   // Fragment shader program
 
   const fsSource = `
-    // Author:
-    // Title:
+    varying lowp vec4 vColor;
 
-    #ifdef GL_ES
-    precision mediump float;
-    #endif
-
-    uniform vec2 uAspect;
-    uniform float uTime;
-
-    vec3 bcol = vec3(1.0, 2.0, 3.0);
-
-    //[[0.072 0.131 0.531] [0.009 0.840 0.177] [0.252 0.541 0.462] [3.268 2.475 1.847]]
-
-    vec3 palette( in float t ){
-        vec3 a = vec3(0.072, 0.131, 0.531);
-        vec3 b = vec3(0.009, 0.840, 0.177);
-        vec3 c = vec3(0.252, 0.541, 0.462);
-        vec3 d = vec3(3.268, 2.475, 1.847);
-        
-        return a + b*cos( 6.283185*(c*t+d) );
-    }
-
-    float sdSegment( in vec2 p, in vec2 a, in vec2 b ){
-        vec2 pa = p-a, ba = b-a;
-        float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
-        return length( pa - ba*h );
-    }
-
-    void main() {
-      vec2 uv = (gl_FragCoord.xy * 2. - uAspect.xy) / uAspect.y;
-      vec2 uv0 = uv;
-      vec2 uv1 = uv;
-      vec2 uv2 = uv;
-      uv.x += 0.5;
-      uv0.x -= 0.5;
-      vec3 finalColor = vec3(0.0);
-        
-      vec2 pos1 = vec2(-1., 0.);
-      vec2 pos2 = vec2(1., 0.);
-      float s1 = sdSegment(uv2, fract(pos1), fract(pos2));
-        
-      float c1 = length(uv);
-      c1 = sin(c1*4.888)/6.;
-      c1 = abs(c1);
-        
-      float c2 = length(uv0);
-      c2 = sin(c2*4.888)/6.;
-      c2 = abs(c2);
-        
-      float d1 = length(uv*2.0) - 0.5;
-      d1 = abs(d1);
-        
-      float d2 = length(uv0*2.0) - 0.5;
-      d2 = abs(d2);
-        
-      vec3 col = palette(d1);
-        
-      vec3 lcol = vec3(3., 2., 1.);
-      lcol.y*=pow(uTime,8.);
-        
-      uv.xy += vec2(-1.0,0.0);
-      uv0.xy += vec2(1.0,0.0);
-        
-      float a1 = atan(uv0.y, uv0.x)+uTime*.04;
-      float a2 = atan(uv.y, uv.x)-uTime*.04;
-
-      float r1 = smoothstep(-0.5,1., cos(a1*10.))*0.2+0.4;
-      float r2 = smoothstep(-.5,1.0, cos(a2*10.))*-0.2+0.6;
-
-      vec3 g1 = vec3(1.-smoothstep(r1,r1+0.02,d1));
-      vec3 g2 = vec3(1.-smoothstep(r2,r2+0.02,d2));
-      vec3 l1 = vec3(s1);
-        
-      finalColor += g1 * col * -uv.y;
-      finalColor += g2 * col * uv0.y;
-      //finalColor += l1 / lcol;
-
-      gl_FragColor = vec4(finalColor,1.0);
+    void main(void) {
+      gl_FragColor = vColor;
     }
   `;
 
@@ -134,10 +66,14 @@ function main() {
     program: shaderProgram,
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+      vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor"),
     },
     uniformLocations: {
-      aspectVector: gl.getUniformLocation(shaderProgram, "uAspect"),
-      deltaTime: gl.getUniformLocation(shaderProgram, "uTime"),
+      projectionMatrix: gl.getUniformLocation(
+        shaderProgram,
+        "uProjectionMatrix"
+      ),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
     },
   };
 
@@ -153,8 +89,8 @@ function main() {
     deltaTime = now - then;
     then = now;
 
-    elapsedTime += deltaTime;
-    drawScene(gl, programInfo, buffers, elapsedTime);
+    drawScene(gl, programInfo, buffers, squareRotation);
+    squareRotation += deltaTime;
 
     requestAnimationFrame(render);
   }

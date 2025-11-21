@@ -64,6 +64,10 @@ function drawScene(gl, programInfo, buffers, squareRotation) {
     false,
     modelViewMatrix
   );
+  gl.uniform2fv(
+    programInfo.uniformLocations.aspectRatio,
+    [gl.canvas.clientWidth, gl.canvas.clientHeight]
+  );
 
   {
     const offset = 0;

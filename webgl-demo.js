@@ -64,7 +64,7 @@ function main() {
     void main(void) {
       vec2 uv = (gl_FragCoord.xy - uResolution) / uResolution.y;
       float pentagon = sdPentagon(uv, 0);
-      gl_FragColor = pentagon * vColor;
+      gl_FragColor = pentagon;
     }
   `;
 

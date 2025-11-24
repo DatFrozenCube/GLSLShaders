@@ -49,7 +49,7 @@ function main() {
   const fsSource = `
     varying lowp vec4 vColor;
 
-    uniform vec2 uResolution;
+    uniform mediump vec2 uResolution;
 
     float sdPentagon( in vec2 p, in float r )
     {

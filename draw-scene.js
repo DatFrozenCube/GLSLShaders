@@ -68,6 +68,10 @@ function drawScene(gl, programInfo, buffers, squareRotation) {
     programInfo.uniformLocations.aspectRatio,
     [gl.canvas.clientWidth, gl.canvas.clientHeight]
   );
+  gl.uniform1f(
+    programInfo.uniformLocations.time,
+    squareRotation
+  );
 
   {
     const offset = 0;
